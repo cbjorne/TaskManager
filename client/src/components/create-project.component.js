@@ -1,17 +1,65 @@
-import React, { Component } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './navbar.component';
 
-const withRouter = WrappedComponent => props => {
+/*const withRouter = WrappedComponent => props => {
     const params = useParams();
 
     return (
         <WrappedComponent params={params}/>
     )
-}
+}*/
 
-class CreateProject extends Component {
+const CreateProject = (props) => {
+    const params = useParams();
+
+    const [name, setName] = useState([]);
+    const [requirements, setRequirements] = useState([]);
+
+    const submit = (e) => {
+        const project = {
+            name: name,
+            tasks: []
+        }
+
+        axios.post(`http://localhost:5000/${params.token}/project/create`, project)
+            .then(res => {
+                if (!res.data.status) {
+                    window.location = '/login';
+                }
+                else if (res.data.exists) {
+                    setRequirements(`${project.name} already exists`);
+                }
+                else {
+                    window.location = `/${params.token}/projects`;
+                }
+            });
+    }
+
+    return (
+        <div>
+            <Navbar token={params.token} />
+            <br />
+            <h3>Create Project</h3>
+            <h4>{requirements}</h4>
+            <form onSubmit={submit}>
+                <div className="form-group">
+                    <label>Project Name</label>
+                    <input type="text" required className="form-control" value={name} onChange={setName} />
+                </div>
+                <div className="form-group">
+                    <input type="submit" value="Create Project" className="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+
+    )
+};
+
+export default CreateProject;
+
+/*class CreateProject extends Component {
     constructor(props) {
         super(props);
 
@@ -77,4 +125,4 @@ class CreateProject extends Component {
     }
 }
 
-export default withRouter(CreateProject);
+export default withRouter(CreateProject);*/
