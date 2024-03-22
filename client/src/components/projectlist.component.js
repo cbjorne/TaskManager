@@ -1,27 +1,19 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './navbar.component';
 
-const withRouter = WrappedComponent => props => {
-    const params = useParams();
-
-    return (
-        <WrappedComponent params={params}/>
-    )
-}
-
 const Project = props => {
     function deleteProject() {
         axios.delete(`http://localhost:5000/${props.token}/project/${props.project._id}`)
-        .then(res => {
-            if(!res.data.status) {
-                window.location = '/login';
-            }
-            else{
-                window.location = `/${props.token}/projects`;
-            }
-        });
+            .then(res => {
+                if (!res.data.status) {
+                    window.location = '/login';
+                }
+                else {
+                    window.location = `/${props.token}/projects`;
+                }
+            });
     }
 
     return (
@@ -32,58 +24,50 @@ const Project = props => {
             </td>
         </tr>
     )
-}
+};
 
-class ProjectList extends Component {
-    constructor(props) {
-        super(props);
+const ProjectList = (props) => {
+    const params = useParams();
 
-        this.state = {
-            projects: []
-        }
-    }
+    const [projects, setProjects] = useState([]);
 
-    componentDidMount() {
-        axios.get(`http://localhost:5000/${this.props.params.token}/project/`)
-        .then(res => {
-            if(res.data.status) {
-                this.setState({
-                    projects: res.data.projects
-                });
-            }
-            else {
-                window.location = '/login';
-            }
-        })
-        .catch(err => console.log(err));
-    }
+    useEffect(() => {
+        axios.get(`http://localhost:5000/${params.token}/project/`)
+            .then(res => {
+                if (res.data.status) {
+                    setProjects(res.data.projects);
+                }
+                else {
+                    window.location = '/login';
+                }
+            })
+            .catch(err => console.log(err));
+    }, []);
 
-    projectList() {
-        return this.state.projects.map(currentProject => {
-            return <Project token={this.props.params.token} project={currentProject} key={currentProject._id}/>;
+    const list = () => {
+        return projects.map(currentProject => {
+            return <Project token={params.token} project={currentProject} key={currentProject._id} />;
         });
-    }
+    };
 
-    render() {
-        return (
-            <div>
-                <Navbar token={this.props.params.token}/>
-                <br/>
-                <h3>Project List</h3>
-                <table className="table">
-                    <thead className="thead-light">
-                        <tr>
-                            <th>Name</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.projectList()}
-                    </tbody>
-                </table>
-            </div>
-        )
-    }
-}
+    return (
+        <div>
+            <Navbar token={params.token} />
+            <br />
+            <h3>Project List</h3>
+            <table className="table">
+                <thead className="thead-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {list()}
+                </tbody>
+            </table>
+        </div>
+    );
+};
 
-export default withRouter(ProjectList);
+export default ProjectList;
