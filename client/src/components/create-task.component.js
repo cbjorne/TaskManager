@@ -46,10 +46,10 @@ const CreateTask = (props) => {
     }, []);
 
     const changeHandler = (e) => {
-        setAllValues({ ...allValues, [e.target.name]: e.target.value })
+        setAllValues({ ...allValues, [e.target.name]: e.target.value });
     };
 
-    const onSubmit = (e) => {
+    const submit = (e) => {
         e.preventDefault();
 
         const body = {
@@ -61,8 +61,6 @@ const CreateTask = (props) => {
             end: allValues.end
         }
 
-        console.log(body);
-
         axios.post(`http://localhost:5000/${params.token}/project/append`, body)
             .then(res => {
                 if (res.data.status) {
@@ -73,14 +71,14 @@ const CreateTask = (props) => {
                 }
             })
 
-    }
+    };
 
     return (
         <div>
             <Navbar token={params.token} />
             <br />
             <h3>Create Task</h3>
-            <form onSubmit={onSubmit}>
+            <form onSubmit={submit}>
                 <div className="form-group">
                     <label>Project</label>
                     <select required className="form-control" name="name" value={allValues.name} onChange={changeHandler}>
