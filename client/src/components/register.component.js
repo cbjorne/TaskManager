@@ -48,8 +48,7 @@ const Register = (props) => {
         e.preventDefault();
 
         window.location = '/login';
-
-    }
+    };
 
     const submit = (e) => {
         e.preventDefault();

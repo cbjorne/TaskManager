@@ -31,12 +31,12 @@ const registerRouter = require('./routes/register');
 const TOKEN_KEY = process.env.TOKEN_KEY;
 
 app.use('/:token', (req, res, next) => {
-    if(req.params.token == 'login' || req.params.token =='register'){
+    if (req.params.token == 'login' || req.params.token == 'register') {
         next();
     }
     else {
         jwt.verify(req.params.token, TOKEN_KEY, (err, data) => {
-            if(err) {
+            if (err) {
                 res.json({ status: false });
             }
             else {
