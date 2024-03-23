@@ -1,15 +1,7 @@
-import React, { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './navbar.component';
-
-const withRouter = WrappedComponent => props => {
-    const params = useParams();
-
-    return (
-        <WrappedComponent params={params}/>
-    )
-}
 
 const User = props => {
     return (
@@ -20,57 +12,49 @@ const User = props => {
             </td>
         </tr>
     );
-}
+};
 
-class UserList extends Component {
-    constructor(props) {
-        super(props);
+const UserList = (props) => {
+    const params = useParams();
 
-        this.state={
-            users: []
-        }
-    }
+    const [users, setUsers] = useState([]);
 
-    componentDidMount() {
-        axios.get(`http://localhost:5000/${this.props.params.token}/user`)
-        .then(res => {
-            if(!res.data.status) {
-                window.location = '/login';
-            }
-            else {
-                this.setState({
-                    users: res.data.users
-                });
-            }
-        })
-        .catch(err => console.log(err));
-    }
+    useEffect(() => {
+        axios.get(`http://localhost:5000/${params.token}/user`)
+            .then(res => {
+                if (!res.data.status) {
+                    window.location = '/login';
+                }
+                else {
+                    setUsers(res.data.users);
+                }
+            })
+            .catch(err => console.log(err));
+    }, []);
 
-    userList() {
-        return this.state.users.map(currentUser => {
-            return <User token={this.props.params.token} user={currentUser} key={currentUser._id}/>;
+    const userList = () => {
+        return users.map(currentUser => {
+            return <User token={params.token} user={currentUser} key={currentUser._id} />;
         });
-    }
+    };
 
-    render() {
-        return (
-            <div>
-                <Navbar token={this.props.params.token}/>
-                <br/>
-                <h3>User List</h3>
-                <table className="table">
-                    <thead className="thead-light">
-                        <tr>
-                            <th>Username</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {this.userList()}
-                    </tbody>
-                </table>
-            </div>
-        )
-    }
-}
+    return (
+        <div>
+            <Navbar token={params.token} />
+            <br />
+            <h3>User List</h3>
+            <table className="table">
+                <thead className="thead-light">
+                    <tr>
+                        <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {userList()}
+                </tbody>
+            </table>
+        </div>
+    );
+};
 
-export default withRouter(UserList);
+export default UserList;
